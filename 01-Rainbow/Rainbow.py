@@ -22,6 +22,7 @@ rainbow_colors = [
 ]
 
 def create_rainbow_line(x, y, h, w, color):
+    """Creates a line that will be part of the rainbow"""
     circle = GOval(x, y, w, h)
     circle.set_color(color)
     circle.set_filled(True)

@@ -45,7 +45,7 @@ def create_triangle() -> GPolygon:
     return tri
 
 
-def create_eyes():
+def create_eyes(gw):
     """Creates the eyes"""
     eye1 = GOval((GWINDOW_WIDTH/2) - EYE_SEP/2 - EYE_WIDTH/2, (GWINDOW_HEIGHT/2) - 100, EYE_WIDTH, EYE_HEIGHT)
     eye1.set_color("black")
@@ -62,11 +62,16 @@ def create_eyes():
     pupil2 = GOval((GWINDOW_WIDTH/2) + EYE_SEP/2 - PUPIL_WIDTH_CENTER_SEP, (GWINDOW_HEIGHT/2) - EYE_SEP/2 - PUPIL_HEIGHT_CENTER_SEP*2, PUPIL_RADIUS, PUPIL_RADIUS)
     pupil2.set_color("black")
     pupil2.set_filled(True)
+    
+    gw.pupil1 = pupil1
+    gw.pupil2 = pupil2
+    
+    gw.lx0 = (GWINDOW_WIDTH/2) - EYE_SEP/2 - PUPIL_WIDTH_CENTER_SEP
+    gw.rx0 = (GWINDOW_WIDTH/2) + EYE_SEP/2 - PUPIL_WIDTH_CENTER_SEP
+    gw.y0 = (GWINDOW_HEIGHT/2) - EYE_SEP/2 - PUPIL_HEIGHT_CENTER_SEP*2
+    
     return eye1, pupil1, eye2, pupil2
-
-
-def pupilsanimation(e):
-    """animates the first pupil"""
+    
 
 
 def draw_face():
@@ -75,6 +80,8 @@ def draw_face():
     gw = GWindow(GWINDOW_WIDTH, GWINDOW_HEIGHT)
 
     face_compound = GCompound()
+    
+    gw.face_compound = face_compound
 
     face = GOval(GWINDOW_WIDTH/2 - FACE_WIDTH/2, GWINDOW_HEIGHT/2 - FACE_HEIGHT/2, FACE_WIDTH, FACE_HEIGHT)
     face.set_color("black")
@@ -88,18 +95,29 @@ def draw_face():
     mouth.set_color("black")
     mouth.set_line_width(1)
     face_compound.add(mouth)
-    gw.add_event_listener("mousemove", pupilsanimation)
     
-    eye1, pupil1, eye2, pupil2 = create_eyes()
-
-
+    eye1, pupil1, eye2, pupil2 = create_eyes(gw)
 
     face_compound.add(eye1)
     face_compound.add(pupil1)
     face_compound.add(eye2)
     face_compound.add(pupil2)
-
-
+    
+    def pupilsanimation(e):
+        """animates the first pupil"""
+        x_cord = e.get_x()
+        y_cord = e.get_y()
+        
+        restriction = sqrt((gw.lx0**2) + (gw.y0**2))
+        print(f"restriction: {restriction}")
+        gw.pupil1.set_bounds(
+            min(x_cord, gw.lx0, restriction),
+            min(y_cord, gw.y0, restriction),
+            abs(x_cord - gw.lx0),
+            abs(y_cord - gw.y0)
+        )
+    
+    gw.add_event_listener("mousemove", pupilsanimation)
 
 
     gw.add(face_compound)
