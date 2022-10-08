@@ -1,13 +1,13 @@
 # File: DrawFace.py
-# Name: your name
+# Name: Sergio Ley Languren
 
 """
 This program draws a face on the window in which the eyes follow the
 mouse.
 """
 
-import math
-from pgl import GWindow, GLine, GOval, GRect, GPolygon
+from pgl import GWindow, GLine, GOval, GRect, GPolygon, GCompound
+from math import sqrt
 
 # Constants
 
@@ -22,12 +22,87 @@ NOSE_HEIGHT = 0.10 * FACE_HEIGHT      # Height of nose relative to face
 MOUTH_WIDTH = 0.50 * FACE_WIDTH       # Width of mouth relative to face
 MOUTH_HEIGHT = 0.03 * FACE_HEIGHT     # Height of mouth relative to face
 PUPIL_RADIUS = 0.2 * EYE_WIDTH        # Pupil radius relative to eye
+EYE_SEP = FACE_WIDTH * 0.4
+PUPIL_HEIGHT_CENTER_SEP = EYE_HEIGHT * 0.5
+PUPIL_WIDTH_CENTER_SEP = EYE_WIDTH * 0.1
+
 
 # Main program
 
+
+# sqrt((x**2) + (y**2))
+
+def create_triangle() -> GPolygon:
+    """Creates a triangle polygon"""
+    tri = GPolygon()
+
+    tri.add_vertex(-NOSE_WIDTH/2, NOSE_HEIGHT/2)
+    tri.add_vertex(NOSE_WIDTH/2, NOSE_HEIGHT/2)
+    tri.add_vertex(0, -NOSE_HEIGHT/2)
+    tri.set_visible(True)
+    tri.set_color("black")
+    tri.set_line_width(2)
+    return tri
+
+
+def create_eyes():
+    """Creates the eyes"""
+    eye1 = GOval((GWINDOW_WIDTH/2) - EYE_SEP/2 - EYE_WIDTH/2, (GWINDOW_HEIGHT/2) - 100, EYE_WIDTH, EYE_HEIGHT)
+    eye1.set_color("black")
+    eye1.set_line_width(1)
+    eye1.set_visible(True)
+    pupil1 = GOval((GWINDOW_WIDTH/2) - EYE_SEP/2 - PUPIL_WIDTH_CENTER_SEP, (GWINDOW_HEIGHT/2) - EYE_SEP/2 - PUPIL_HEIGHT_CENTER_SEP*2, PUPIL_RADIUS, PUPIL_RADIUS)
+    pupil1.set_color("black")
+    pupil1.set_filled(True)
+
+    eye2 = GOval((GWINDOW_WIDTH/2) + EYE_SEP/2 - EYE_WIDTH/2, (GWINDOW_HEIGHT/2) - 100, EYE_WIDTH, EYE_HEIGHT)
+    eye2.set_color("black")
+    eye2.set_line_width(1)
+    eye1.set_visible(True)
+    pupil2 = GOval((GWINDOW_WIDTH/2) + EYE_SEP/2 - PUPIL_WIDTH_CENTER_SEP, (GWINDOW_HEIGHT/2) - EYE_SEP/2 - PUPIL_HEIGHT_CENTER_SEP*2, PUPIL_RADIUS, PUPIL_RADIUS)
+    pupil2.set_color("black")
+    pupil2.set_filled(True)
+    return eye1, pupil1, eye2, pupil2
+
+
+def pupilsanimation(e):
+    """animates the first pupil"""
+
+
 def draw_face():
     """Draws a face in which the eyes track the mouse."""
-    # You fill in the code
+
+    gw = GWindow(GWINDOW_WIDTH, GWINDOW_HEIGHT)
+
+    face_compound = GCompound()
+
+    face = GOval(GWINDOW_WIDTH/2 - FACE_WIDTH/2, GWINDOW_HEIGHT/2 - FACE_HEIGHT/2, FACE_WIDTH, FACE_HEIGHT)
+    face.set_color("black")
+    face.set_line_width(1)
+    face_compound.add(face)
+
+    tri = create_triangle()
+    face_compound.add(tri, GWINDOW_WIDTH/2, GWINDOW_HEIGHT/2)
+
+    mouth = GRect((GWINDOW_WIDTH/2) - 50, (FACE_HEIGHT*2)/2, MOUTH_WIDTH, MOUTH_HEIGHT)
+    mouth.set_color("black")
+    mouth.set_line_width(1)
+    face_compound.add(mouth)
+    gw.add_event_listener("mousemove", pupilsanimation)
+    
+    eye1, pupil1, eye2, pupil2 = create_eyes()
+
+
+
+    face_compound.add(eye1)
+    face_compound.add(pupil1)
+    face_compound.add(eye2)
+    face_compound.add(pupil2)
+
+
+
+
+    gw.add(face_compound)
 
 # Startup code
 

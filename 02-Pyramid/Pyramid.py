@@ -28,21 +28,27 @@ def create_pyramid_block(x,y):
 def pyramid():
     """Draws a pyramid on the graphics window."""
     gw = GWindow(GWINDOW_WIDTH, GWINDOW_HEIGHT)
-    # You fill in the rest
+
+    gw.bricks_in_base = BRICKS_IN_BASE
+
     line = ""
     
-    # compound = GCompound()
+    compound = GCompound()
     
-    # count = 0
+    gw.X = GWINDOW_WIDTH - 450 # base x_cord
+    gw.x_cord = gw.X # x_cord that will be later modified
+    gw.x_increment = 15
+    gw.y_cord = 260
+    for _ in range(gw.bricks_in_base+1):
+        for b in range(gw.bricks_in_base+1):
+            compound.add(create_pyramid_block(gw.x_cord, gw.y_cord))
+            gw.x_cord += 30
+        gw.bricks_in_base = gw.bricks_in_base - 1
+        gw.x_cord = gw.X + gw.x_increment
+        gw.x_increment = gw.x_increment + 15
+        gw.y_cord -= 15
     
-    # for y_cord in range(GWINDOW_HEIGHT + 1):
-    #     x_cord = (GWINDOW_WIDTH / 2)
-    #     compound.add(create_pyramid_block(x_cord, y_cord))
-    #     count += 1
-    # gw.add(compound)
-    
-    rect = create_pyramid_block(GWINDOW_WIDTH/2, 0)
-    gw.add(rect)
+    gw.add(compound)
 
 
 # Startup code
