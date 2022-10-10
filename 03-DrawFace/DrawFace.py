@@ -7,8 +7,7 @@ mouse.
 """
 
 from pgl import GWindow, GLine, GOval, GRect, GPolygon, GCompound
-from math import sqrt
-
+import math
 # Constants
 
 GWINDOW_WIDTH = 500                   # Width of the graphics window
@@ -25,6 +24,8 @@ PUPIL_RADIUS = 0.2 * EYE_WIDTH        # Pupil radius relative to eye
 EYE_SEP = FACE_WIDTH * 0.4
 PUPIL_HEIGHT_CENTER_SEP = EYE_HEIGHT * 0.5
 PUPIL_WIDTH_CENTER_SEP = EYE_WIDTH * 0.1
+EYE_RADIUS = EYE_WIDTH/2
+EYE_AREA = math.pi * EYE_RADIUS**2
 
 
 # Main program
@@ -66,10 +67,10 @@ def create_eyes(gw):
     gw.pupil1 = pupil1
     gw.pupil2 = pupil2
     
-    gw.lx0 = (GWINDOW_WIDTH/2) - EYE_SEP/2 - PUPIL_WIDTH_CENTER_SEP
-    gw.rx0 = (GWINDOW_WIDTH/2) + EYE_SEP/2 - PUPIL_WIDTH_CENTER_SEP
-    gw.y0 = (GWINDOW_HEIGHT/2) - EYE_SEP/2 - PUPIL_HEIGHT_CENTER_SEP*2
-    
+    gw.lx0 = (GWINDOW_WIDTH/2) - EYE_SEP/2 - PUPIL_WIDTH_CENTER_SEP - EYE_RADIUS
+    gw.rx0 = (GWINDOW_WIDTH/2) + EYE_SEP/2 - PUPIL_WIDTH_CENTER_SEP - EYE_RADIUS
+    gw.ly0 = (GWINDOW_HEIGHT/2) - EYE_SEP/2 - PUPIL_HEIGHT_CENTER_SEP - EYE_HEIGHT/2
+    gw.ry0 = (GWINDOW_HEIGHT/2) - EYE_SEP/2 - PUPIL_HEIGHT_CENTER_SEP - EYE_HEIGHT/2
     return eye1, pupil1, eye2, pupil2
     
 
@@ -108,13 +109,18 @@ def draw_face():
         x_cord = e.get_x()
         y_cord = e.get_y()
         
-        restriction = sqrt((gw.lx0**2) + (gw.y0**2))
-        print(f"restriction: {restriction}")
-        gw.pupil1.set_bounds(
-            min(x_cord, gw.lx0, restriction),
-            min(y_cord, gw.y0, restriction),
-            abs(x_cord - gw.lx0),
-            abs(y_cord - gw.y0)
+        restrictionlw = math.sqrt((gw.lx0**2) + (gw.ly0**2)) / EYE_RADIUS
+        restrictionlh = math.sqrt((gw.lx0**2) + (gw.ly0**2)) / EYE_HEIGHT/2
+        restrictionrw = math.sqrt((gw.rx0**2) + (gw.ry0**2)) / EYE_RADIUS
+        restrictionrh = math.sqrt((gw.rx0**2) + (gw.ry0**2)) / EYE_HEIGHT/2
+        gw.pupil1.set_location(
+            abs((x_cord - gw.lx0)/restrictionlw),
+            abs((-y_cord + gw.ly0)/restrictionlh)
+        )
+
+        gw.pupil2.set_location(
+            abs((-x_cord - gw.rx0)/restrictionrw),
+            abs((y_cord - gw.ry0)/restrictionrh)
         )
     
     gw.add_event_listener("mousemove", pupilsanimation)
